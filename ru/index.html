@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Наглядная 24-часовая шкала времени · Удобный поиск общих часов для созвонов</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Все важные для вас часовые пояса — в один клик.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Интерактивная демонстрация: 24-часовой ползунок часовых поясов и города">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Время ползунка:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Ханой)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Ханой</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Рабочие часы (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Токио</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Рабочие часы (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 Лондон</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Бодрствует / Гибко (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 Сан-Франциско</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Спит / Ночь (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Передвигайте ползунок, чтобы найти время, когда все коллеги бодрствуют</span>
+  </div>
+  <p class="demo-note">Визуальная симуляция. В приложении для Mac Zonette находится в строке меню и в один клик копирует временные метки для Slack.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Ханой)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Рабочие часы (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Бодрствует / Гибко (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Спит / Ночь (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Требуется macOS 14 Sonoma или новее, iOS 17 или iPadOS 17 или новее либо Android 8.0 или новее. Одна покупка в App Store действует на Mac, iPhone и iPad; версия для Android покупается отдельно в Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Счет часовых поясов в уме в сравнении с Zonette</h2>
+  <p class="section-lead">Назначайте международные встречи без мучительных подсчетов и звонков в 3 часа ночи.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Критерий</th>
+          <th>Счет в уме и поисковики</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Общие часы</strong></td>
+          <td>Вычисление разницы UTC в голове или частые запросы в поисковике</td>
+          <td class="highlight-col"><strong>Потяните один бегунок, чтобы увидеть зеленые общие рабочие часы</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Быстрый взгляд</strong></td>
+          <td>Открытие вкладок браузера или виджетов в смартфоне</td>
+          <td class="highlight-col"><strong>Аккуратное отображение времени городов прямо в строке меню macOS</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Отправка времени</strong></td>
+          <td>Набор в рабочих чатах неоднозначного локального времени</td>
+          <td class="highlight-col"><strong>Один клик копирует универсальный формат времени для Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Летнее время</strong></td>
+          <td>Забывание сезонных переводов часов на других континентах</td>
+          <td class="highlight-col"><strong>Автоматический и точный учет всех сезонных переходов времени</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Конфиденциальность</strong></td>
+          <td>Сайты-конвертеры, перегруженные рекламой и трекерами</td>
+          <td class="highlight-col"><strong>100% локальные вычисления на компьютере без доступа к сети</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Конфиденциальность в одном абзаце</h2>
   <p>У Zonette нет доступа к сети, нет учётной записи и нет отслеживания. Список городов и карта входят в приложение. Если вы включите события, приложение читает календарь на вашем устройстве и никогда ничего никуда не отправляет. Полная <a href="privacy.html">политика конфиденциальности</a> говорит то же самое подробнее.</p>

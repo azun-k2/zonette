@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Curseur temporel visuel sur 24h · Trouvez les créneaux communs de réunion</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Tous les fuseaux horaires qui comptent pour vous, à un clic.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Démonstration interactive : curseur de fuseaux horaires sur 24 heures et villes">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Glisser l'heure :</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoï)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoï</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Heures de bureau (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Heures de bureau (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 Londres</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Éveillé / Flexible (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Dort / Nuit (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Déplacez le curseur pour identifier les plages communes d'éveil</span>
+  </div>
+  <p class="demo-note">Simulation visuelle. Dans l’app Mac, Zonette reste dans la barre des menus et copie les horodatages Slack en un clic.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoï)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Heures de bureau (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Éveillé / Flexible (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Dort / Nuit (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Nécessite macOS 14 Sonoma ou ultérieur, iOS 17 ou iPadOS 17 ou ultérieur, ou Android 8.0 ou ultérieur. Un seul achat sur l’App Store couvre le Mac, l’iPhone et l’iPad ; la version Android s’achète à part sur Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Calcul mental des fuseaux horaires vs Zonette</h2>
+  <p class="section-lead">Coordonnez vos appels internationaux sans gymnastique mentale ni réveil à 3h du matin.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Critère</th>
+          <th>Calcul mental et Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Créneaux communs</strong></td>
+          <td>Calculer les décalages UTC de tête ou chercher sur Google</td>
+          <td class="highlight-col"><strong>Glissez un curseur et voyez les heures de bureau communes en vert</strong></td>
+        </tr>
+        <tr>
+          <td><strong>D'un coup d'œil</strong></td>
+          <td>Ouvrir des onglets web ou consulter son smartphone</td>
+          <td class="highlight-col"><strong>Heures discrètes de vos villes favorites directement dans la barre des menus</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Partage d'heures</strong></td>
+          <td>Écrire des heures locales ambiguës dans les messages</td>
+          <td class="highlight-col"><strong>Un clic copie la chaîne au format universel prêt pour Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Heure d'été</strong></td>
+          <td>Oublier les changements d'heure saisonniers outre-mer</td>
+          <td class="highlight-col"><strong>Prise en compte automatique et exacte des bascules d'heure d'été</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Confidentialité</strong></td>
+          <td>Sites de conversion saturés de bannières et de traqueurs</td>
+          <td class="highlight-col"><strong>Calculs 100% locaux sur votre appareil sans aucun accès réseau</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>La confidentialité en un paragraphe</h2>
   <p>Zonette n’a aucun accès au réseau, aucun compte et aucun pistage. La liste des villes et la carte sont fournies avec l’app. Si vous activez les événements, elle lit votre calendrier sur votre appareil et n’envoie jamais rien nulle part. La <a href="privacy.html">politique de confidentialité</a> complète dit la même chose plus en détail.</p>

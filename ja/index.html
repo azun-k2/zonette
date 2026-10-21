@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ 直感的な24時間タイムライン · 世界のチームとの共通ミーティング時間を一目で発見</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">気になるタイムゾーンを、すべてワンクリックで。</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="インタラクティブデモ：24時間タイムゾーンスライダーと主要都市カード">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 時刻をドラッグ：</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (ハノイ)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 ハノイ</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">営業時間 (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 東京</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">営業時間 (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 ロンドン</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">覚醒中 / 稼働可能 (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 サンフランシスコ</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">就寝中 / 深夜 (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 スライダーをドラッグして、各国の同僚が起きている共通時間帯を確認できます</span>
+  </div>
+  <p class="demo-note">視覚的シミュレーションです。Macアプリ版ではメニューバーからSlack用タイムスタンプをワンクリックでコピーできます。</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (ハノイ)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "営業時間 (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "覚醒中 / 稼働可能 (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "就寝中 / 深夜 (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">macOS 14 Sonoma以降、iOS 17またはiPadOS 17以降、またはAndroid 8.0以降が必要です。App Storeでの1回の購入でMac、iPhone、iPadのすべてで使えます。Android版はGoogle Playで別途購入します。</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>時差の暗算・検索とZonetteの比較</h2>
+  <p class="section-lead">頭の中で時差を計算したり深夜3時に誤って連絡する失敗なく、世界とスムーズに連携。</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>暗算とウェブ検索</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>共通時間の発見</strong></td>
+          <td>時差を暗算するか、毎回Googleで「現在時刻」を検索する手間</td>
+          <td class="highlight-col"><strong>スライダーをスッと動かすだけで全員の稼働可能な時間が緑色で即判明</strong></td>
+        </tr>
+        <tr>
+          <td><strong>確認のしやすさ</strong></td>
+          <td>ブラウザの時差タブを開くかスマートフォンの時計を確認する</td>
+          <td class="highlight-col"><strong>macOSのメニューバー内にいつでも控えめに世界の現在時刻が表示</strong></td>
+        </tr>
+        <tr>
+          <td><strong>日時の共有</strong></td>
+          <td>チャットで「こちらの15時、そちらの何時？」と曖昧に伝える</td>
+          <td class="highlight-col"><strong>ワンクリックでSlack相手の現地時刻に自動変換される文字列をコピー</strong></td>
+        </tr>
+        <tr>
+          <td><strong>サマータイム</strong></td>
+          <td>年2回行われる海外のサマータイム切り替え時期を忘れて遅刻</td>
+          <td class="highlight-col"><strong>世界各国のサマータイム自動追従に対応し、切り替え忘れを完全防止</strong></td>
+        </tr>
+        <tr>
+          <td><strong>プライバシー</strong></td>
+          <td>広告やCookie追跡が大量に埋め込まれた無料変換ウェブサイト</td>
+          <td class="highlight-col"><strong>完全通信なし、Macローカル上のみで100%瞬時に計算を実行</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>プライバシーをひとことで</h2>
   <p>Zonetteにはネットワークアクセスもアカウントもトラッキングもありません。都市リストと地図はアプリに含まれています。予定の表示をオンにすると、デバイス上でカレンダーを読み取りますが、どこにも何も送信しません。詳しくは<a href="privacy.html">プライバシーポリシー</a>の全文をご覧ください。</p>

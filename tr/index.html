@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Görsel 24 saatlik zaman çizelgesi · Çakışan toplantı saatlerini anında bulun</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Önem verdiğin her saat dilimi bir tık uzağında.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Etkileşimli demo: 24 saatlik saat dilimi kaydırıcısı ve şehir kartları">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Saati kaydır:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoi)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoi</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Mesai Saatleri (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Mesai Saatleri (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 Londra</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Uyanık / Esnek (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Uykuda / Gece (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Dünyadaki ekiplerin ortak çalışma saatlerini bulmak için zaman çizelgesini kaydırın</span>
+  </div>
+  <p class="demo-note">Görsel simülasyon. Mac uygulamasında Zonette menü çubuğunda yer alır ve Slack için tek tıkla zaman damgası kopyalar.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoi)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Mesai Saatleri (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Uyanık / Esnek (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Uykuda / Gece (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">macOS 14 Sonoma veya üstü, iOS 17 ya da iPadOS 17 veya üstü ya da Android 8.0 veya üstü gerekir. App Store’dan tek bir satın alma Mac, iPhone ve iPad’i kapsar; Android sürümü Google Play’den ayrıca satın alınır.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Zihinden saat farkı hesaplama ile Zonette karşılaştırması</h2>
+  <p class="section-lead">Kafadan hesap yapmadan veya gece saat 3'te sürpriz yaşamadan uluslararası aramalar planlayın.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Özellik</th>
+          <th>Zihinden Hesap ve Arama</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ortak Saat Bulma</strong></td>
+          <td>UTC farklarını kafadan hesaplamak veya sürekli arama yapmak</td>
+          <td class="highlight-col"><strong>Tek bir kaydırıcıyı çekerek yeşil yanan ortak mesai saatlerini görün</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Tek Bakışta</strong></td>
+          <td>Tarayıcı sekmeleri açmak veya telefondaki araç takımlarını kontrol etmek</td>
+          <td class="highlight-col"><strong>Seçilen şehirlerin saatleri doğrudan macOS menü çubuğunuzda</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Saat Paylaşımı</strong></td>
+          <td>Ekip sohbetlerinde kafa karıştıran yerel saatler yazmak</td>
+          <td class="highlight-col"><strong>Tek tıkla Slack için evrensel biçimlendirilmiş zaman damgasını kopyalayın</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Yaz Saati</strong></td>
+          <td>Diğer kıtalardaki yaz saati değişikliklerini unutup geç kalmak</td>
+          <td class="highlight-col"><strong>Mevsimsel saat değişikliklerini otomatik ve kusursuz yönetir</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Gizlilik</strong></td>
+          <td>Reklamlar ve izleme çerezleriyle dolu saat dönüştürme siteleri</td>
+          <td class="highlight-col"><strong>Sıfır ağ erişimiyle cihazınızda %100 yerel hesaplamalar</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Tek paragrafta gizlilik</h2>
   <p>Zonette’in ağ erişimi, hesabı ve izlemesi yoktur. Şehir listesi ve harita uygulamayla birlikte gelir. Etkinlikleri açarsan takvimini cihazında okur ve hiçbir zaman hiçbir yere hiçbir şey göndermez. <a href="privacy.html">Gizlilik politikasının</a> tamamı aynı şeyi daha ayrıntılı anlatır.</p>

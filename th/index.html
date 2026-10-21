@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ แถบเลื่อนไทม์ไลน์ 24 ชั่วโมงแบบภาพ · ค้นหาเวลาประชุมที่ตรงกันทั่วโลก</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">ทุกเขตเวลาที่คุณสนใจ ห่างไปแค่คลิกเดียว</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="การสาธิตแบบอินเทอร์แอคทีฟ: ตัวเลื่อนโซนเวลา 24 ชั่วโมงและการ์ดเมือง">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 เลื่อนเวลา:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (ฮานอย)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 ฮานอย</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">เวลาทำงาน (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 โตเกียว</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">เวลาทำงาน (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 ลอนดอน</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">ตื่นอยู่ / ยืดหยุ่น (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 ซานฟรานซิสโก</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">นอนหลับ / กลางคืน (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 เลื่อนแถบเวลาเพื่อค้นหาเวลาทำงานร่วมกันของทีมงานทั่วโลก</span>
+  </div>
+  <p class="demo-note">การจำลองภาพ ในแอป Mac จริง Zonette อยู่บนแถบเมนูและคัดลอกเวลาสำหรับ Slack ได้ในคลิกเดียว</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (ฮานอย)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "เวลาทำงาน (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "ตื่นอยู่ / ยืดหยุ่น (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "นอนหลับ / กลางคืน (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">ต้องใช้ macOS 14 Sonoma ขึ้นไป, iOS 17 หรือ iPadOS 17 ขึ้นไป หรือ Android 8.0 ขึ้นไป ซื้อครั้งเดียวจาก App Store ใช้ได้ทั้งบน Mac, iPhone และ iPad ส่วนเวอร์ชัน Android ต้องซื้อแยกจาก Google Play</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>การคำนวณเขตเวลาในใจเทียบกับ Zonette</h2>
+  <p class="section-lead">ประสานงานการโทรระหว่างประเทศได้โดยไม่ต้องคำนวณเวลาในหัวหรือโทรผิดตอนตี 3</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>คุณสมบัติ</th>
+          <th>คิดในใจและค้นหา Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>หาเวลาที่ตรงกัน</strong></td>
+          <td>ต้องบวกลบเวลา UTC ในใจหรือค้นหาในกูเกิลซ้ำๆ</td>
+          <td class="highlight-col"><strong>เลื่อนแถบเดียวเพื่อดูช่วงเวลาทำงานร่วมกันไฮไลต์สีเขียวทันที</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ดูเวลาได้รวดเร็ว</strong></td>
+          <td>ต้องเปิดแท็บเบราว์เซอร์หรือดูวิดเจ็ตในโทรศัพท์</td>
+          <td class="highlight-col"><strong>เวลาของเมืองต่างๆ แสดงบนแถบเมนูของ Mac ได้อย่างเรียบร้อย</strong></td>
+        </tr>
+        <tr>
+          <td><strong>แชร์เวลานัดหมาย</strong></td>
+          <td>พิมพ์เวลาท้องถิ่นที่ทำให้คนอื่นสับสนในห้องแชท</td>
+          <td class="highlight-col"><strong>คลิกเดียวคัดลอกรูปแบบเวลาสากลที่พร้อมส่งใน Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>เวลาออมแสง (DST)</strong></td>
+          <td>ลืมการปรับเวลาตามฤดูกาลในทวีปอื่นจนพลาดนัด</td>
+          <td class="highlight-col"><strong>ปรับเวลาตามฤดูกาลทั่วโลกได้อย่างแม่นยำอัตโนมัติ</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ความเป็นส่วนตัว</strong></td>
+          <td>เว็บไซต์แปลงเวลาเต็มไปด้วยโฆษณาและคุกกี้ติดตาม</td>
+          <td class="highlight-col"><strong>คำนวณบนอุปกรณ์ของคุณ 100% โดยไม่ต้องเชื่อมต่อเครือข่าย</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>ความเป็นส่วนตัวในย่อหน้าเดียว</h2>
   <p>Zonette ไม่มีการเข้าถึงเครือข่าย ไม่มีบัญชี และไม่มีการติดตาม รายชื่อเมืองและแผนที่มาพร้อมแอป หากคุณเปิดใช้กิจกรรม แอปจะอ่านปฏิทินบนอุปกรณ์ของคุณ และไม่ส่งสิ่งใดไปที่ใดเลย <a href="privacy.html">นโยบายความเป็นส่วนตัว</a>ฉบับเต็มอธิบายเรื่องเดียวกันโดยละเอียด</p>

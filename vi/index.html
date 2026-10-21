@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Trục thời gian 24h trực quan · Tìm giờ họp chung giữa các múi giờ</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Mọi múi giờ bạn quan tâm, chỉ cách một cú nhấp.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Bản demo tương tác: thanh trượt múi giờ 24h và đối chiếu các thành phố">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Kéo mốc giờ:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hà Nội)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hà Nội</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Giờ làm việc (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Giờ làm việc (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 London</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Đang thức / Linh hoạt (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Đang ngủ / Ban đêm (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Kéo thanh trượt timeline để tìm khoảng thời gian mọi người cùng thức</span>
+  </div>
+  <p class="demo-note">Mô phỏng trực quan. Trên ứng dụng Mac, Zonette nằm gọn trên thanh menu giúp sao chép timestamp cho Slack chỉ với 1 cú click.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hà Nội)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Giờ làm việc (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Đang thức / Linh hoạt (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Đang ngủ / Ban đêm (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Yêu cầu macOS 14 Sonoma trở lên, iOS 17 hoặc iPadOS 17 trở lên, hoặc Android 8.0 trở lên. Mua một lần trên App Store là dùng được trên Mac, iPhone và iPad; phiên bản Android được mua riêng trên Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Tính nhẩm múi giờ thủ công so với Zonette</h2>
+  <p class="section-lead">Lên lịch làm việc quốc tế chuẩn xác mà không cần tính nhẩm hay lo gọi nhầm lúc nửa đêm.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Đặc tính</th>
+          <th>Tính nhẩm & Tra Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tìm giờ họp chung</strong></td>
+          <td>Cộng trừ múi giờ bằng đầu hoặc gõ tìm kiếm Google liên tục</td>
+          <td class="highlight-col"><strong>Kéo thanh trượt để thấy ngay khung giờ vàng làm việc chung</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Xem nhanh</strong></td>
+          <td>Phải mở tab web chuyển đổi giờ hoặc xem widget điện thoại</td>
+          <td class="highlight-col"><strong>Hiển thị tinh tế ngay trên thanh menu macOS chỉ với 1 cú click</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Chia sẻ giờ hẹn</strong></td>
+          <td>Nhắn tin giờ địa phương dễ gây hiểu nhầm cho đối tác</td>
+          <td class="highlight-col"><strong>Một click sao chép chuỗi thời gian định dạng chuẩn cho Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Giờ mùa hè (DST)</strong></td>
+          <td>Dễ quên việc các nước đổi giờ mùa hè 2 lần mỗi năm</td>
+          <td class="highlight-col"><strong>Tự động cập nhật chuyển đổi giờ mùa hè mượt mà và chính xác</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Bảo mật</strong></td>
+          <td>Các trang web tra cứu đầy quảng cáo và theo dõi cookie</td>
+          <td class="highlight-col"><strong>Tính toán 100% trên máy của bạn, hoàn toàn không kết nối mạng</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Quyền riêng tư trong một đoạn</h2>
   <p>Zonette không có quyền truy cập mạng, không tài khoản và không theo dõi. Danh sách thành phố và bản đồ đi kèm ứng dụng. Nếu bạn bật sự kiện, ứng dụng đọc lịch của bạn ngay trên thiết bị và không bao giờ gửi bất cứ thứ gì đi đâu. Toàn văn <a href="privacy.html">chính sách quyền riêng tư</a> nói điều tương tự, chi tiết hơn.</p>

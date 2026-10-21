@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Garis masa visual 24 jam · Cari waktu mesyuarat bertindih dengan mudah</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Setiap zon waktu yang penting bagi anda, sekali klik sahaja.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Demo interaktif: penggelongsor zon masa 24 jam dan kad bandar">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Seret Masa:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoi)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoi</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Waktu Pejabat (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Waktu Pejabat (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 London</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Terjaga / Fleksibel (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Tidur / Malam (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Seret bar masa untuk mencari waktu kerja bersama pasukan global</span>
+  </div>
+  <p class="demo-note">Simulasi visual. Dalam aplikasi Mac, Zonette berada di bar menu dan menyalin cap masa Slack serta-merta.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoi)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Waktu Pejabat (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Terjaga / Fleksibel (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Tidur / Malam (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Memerlukan macOS 14 Sonoma atau lebih baharu, iOS 17 atau iPadOS 17 atau lebih baharu, atau Android 8.0 atau lebih baharu. Satu pembelian di App Store meliputi Mac, iPhone dan iPad; versi Android dibeli berasingan di Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Kiraan zon masa manual berbanding Zonette</h2>
+  <p class="section-lead">Selaraskan panggilan antarabangsa tanpa pengiraan rumit atau panggilan mengejut jam 3 pagi.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Ciri</th>
+          <th>Kiraan Minda & Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Waktu Bertindih</strong></td>
+          <td>Mengira perbezaan UTC di dalam kepala atau sering mencari di Google</td>
+          <td class="highlight-col"><strong>Seret satu peluncur untuk melihat waktu kerja bersama berlatar hijau</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Pandangan Pantas</strong></td>
+          <td>Membuka tab pelayar atau memeriksa widget telefon</td>
+          <td class="highlight-col"><strong>Waktu bandar pilihan dipaparkan kemas di bar menu macOS</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Berkongsi Waktu</strong></td>
+          <td>Menaip waktu tempatan yang mengelirukan dalam sembang kumpulan</td>
+          <td class="highlight-col"><strong>Satu klik menyalin format waktu sejagat untuk Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Waktu Jimat Siang</strong></td>
+          <td>Terlupa peralihan waktu musim panas di benua lain</td>
+          <td class="highlight-col"><strong>Pengendalian automatik dan tepat bagi setiap peralihan waktu bermusim</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Privasi</strong></td>
+          <td>Laman web penukar masa yang sarat dengan iklan dan penjejak</td>
+          <td class="highlight-col"><strong>100% pengiraan tempatan pada Mac anda tanpa akses rangkaian</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Privasi dalam satu perenggan</h2>
   <p>Zonette tiada akses rangkaian, tiada akaun dan tiada penjejakan. Senarai bandar dan peta disertakan bersama app. Jika anda menghidupkan acara, ia membaca kalendar anda pada peranti anda dan tidak pernah menghantar apa-apa ke mana-mana. <a href="privacy.html">Dasar privasi</a> penuh menyatakan perkara yang sama dengan lebih terperinci.</p>

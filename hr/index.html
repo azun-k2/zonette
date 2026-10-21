@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Vizualna 24-satna vremenska crta · Pronađite zajedničko vrijeme za sastanke</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Svaka vremenska zona do koje ti je stalo, na jedan klik.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Interaktivni demo: 24-satni klizač vremenskih zona i kartice gradova">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Povuci vrijeme:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoj)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoj</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Radno vrijeme (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokio</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Radno vrijeme (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 London</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Budan / Fleksibilno (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Spava / Noć (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Povucite klizač da pronađete zajedničko radno vrijeme globalnih timova</span>
+  </div>
+  <p class="demo-note">Vizualna simulacija. U Mac aplikaciji Zonette živi u traci izbornika s kopiranjem vremena za Slack jednim klikom.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoj)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Radno vrijeme (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Budan / Fleksibilno (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Spava / Noć (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Zahtijeva macOS 14 Sonoma ili noviji, iOS 17 ili iPadOS 17 ili noviji, ili Android 8.0 ili noviji. Jedna kupnja u App Storeu vrijedi za Mac, iPhone i iPad; verzija za Android kupuje se zasebno na Google Playu.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Ručno računanje vremenskih zona u odnosu na Zonette</h2>
+  <p class="section-lead">Organizirajte međunarodne pozive bez računanja napamet ili poziva u 3 ujutro.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Značajka</th>
+          <th>Računanje napamet i Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Zajedničko vrijeme</strong></td>
+          <td>Računanje vremenskih razlika u glavi ili stalno pretraživanje</td>
+          <td class="highlight-col"><strong>Povucite klizač i odmah vidite zeleno istaknuto radno vrijeme</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Brzi pogled</strong></td>
+          <td>Otvaranje kartica preglednika ili provjera na telefonu</td>
+          <td class="highlight-col"><strong>Diskretan prikaz vremena u gradovima izravno u traci izbornika</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Dijeljenje vremena</strong></td>
+          <td>Pisanje zbunjujućih lokalnih vremena u porukama</td>
+          <td class="highlight-col"><strong>Jednim klikom kopirate univerzalno formatirano vrijeme za Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Ljetno vrijeme</strong></td>
+          <td>Zaboravljanje pomicanja sata na drugim kontinentima</td>
+          <td class="highlight-col"><strong>Automatska i točna prilagodba sezonskim promjenama vremena</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Privatnost</strong></td>
+          <td>Web stranice pretrpane oglasima i kolačićima za praćenje</td>
+          <td class="highlight-col"><strong>100% lokalni izračuni na vašem Macu bez pristupa mreži</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Privatnost u jednom odlomku</h2>
   <p>Zonette nema pristup mreži, račun ni praćenje. Popis gradova i karta dolaze s aplikacijom. Ako uključiš događaje, aplikacija čita tvoj kalendar na tvojem uređaju i nikad ništa nikamo ne šalje. Potpuna <a href="privacy.html">pravila privatnosti</a> govore isto, ali opširnije.</p>

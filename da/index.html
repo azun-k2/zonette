@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Visuel 24-timers tidslinje · Find fælles mødetidspunkter på tværs af zoner</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Alle de tidszoner, du holder øje med, ét klik væk.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Interaktiv demo: 24-timers tidszone-skyder og byoversigt">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Træk tidspunkt:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoi)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoi</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Arbejdstid (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Arbejdstid (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 London</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Vågen / Fleksibel (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Sover / Nat (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Træk i tidslinjen for at finde fælles arbejdstider for globale teams</span>
+  </div>
+  <p class="demo-note">Visuel simulation. I Mac-appen sidder Zonette i menulinjen med lynhurtig kopiering af tidsstempler til Slack.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoi)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Arbejdstid (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Vågen / Fleksibel (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Sover / Nat (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Kræver macOS 14 Sonoma eller nyere, iOS 17 eller iPadOS 17 eller nyere eller Android 8.0 eller nyere. Ét køb i App Store gælder til Mac, iPhone og iPad; Android-versionen købes separat på Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Hovedregning med tidszoner sammenlignet med Zonette</h2>
+  <p class="section-lead">Koordiner internationale møder uden hovedregning eller opkald kl. 3 om natten.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Aspekt</th>
+          <th>Hovedregning og Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Fælles tid</strong></td>
+          <td>Regne UTC-forskelle i hovedet eller søge på Google</td>
+          <td class="highlight-col"><strong>Træk i én skyder og se fælles arbejdstider grønt fremhævet</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Hurtigt overblik</strong></td>
+          <td>Åbne browserfaner eller tjekke widgets på telefonen</td>
+          <td class="highlight-col"><strong>Diskret visning af udvalgte byers tid direkte i menulinjen</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Deling af tid</strong></td>
+          <td>Skrive forvirrende lokale tidspunkter i team-chatten</td>
+          <td class="highlight-col"><strong>Ét klik kopierer universelt formateret tid til Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Sommertid</strong></td>
+          <td>Glemme sommer- og vintertidsskift på andre kontinenter</td>
+          <td class="highlight-col"><strong>Automatisk og nøjagtig håndtering af sæsonskift</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Privatliv</strong></td>
+          <td>Hjemmesider fyldt med reklamer og sporingscookies</td>
+          <td class="highlight-col"><strong>100% lokal beregning på din Mac uden netværksadgang</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Privatliv i ét afsnit</h2>
   <p>Zonette har ingen netværksadgang, ingen konto og ingen sporing. Listen over byer og kortet følger med appen. Hvis du slår begivenheder til, læser den din kalender på din enhed og sender aldrig noget nogen steder hen. Den fulde <a href="privacy.html">privatlivspolitik</a> siger det samme mere udførligt.</p>

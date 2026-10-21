@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ 직관적인 24시간 타임라인 스크러버 · 글로벌 미팅 겹치는 시간대 즉시 탐색</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">신경 쓰이는 모든 시간대를 클릭 한 번으로.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="인터랙티브 데모: 24시간 시간대 슬라이더 및 주요 도시 카드">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 시간 드래그:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (하노이)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 하노이</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">업무 시간 (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 도쿄</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">업무 시간 (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 런던</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">깨어있음 / 유연 (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 샌프란시스코</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">취침 / 심야 (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 타임라인 슬라이더를 드래그하여 전 세계 팀원들이 모두 깨어있는 시간을 찾아보세요</span>
+  </div>
+  <p class="demo-note">시각적 시뮬레이션입니다. Mac 앱에서는 메뉴 막대에 상주하며 클릭 한 번으로 Slack용 타임스탬프를 복사합니다.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (하노이)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "업무 시간 (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "깨어있음 / 유연 (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "취침 / 심야 (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">macOS 14 Sonoma 이상, iOS 17 또는 iPadOS 17 이상, 또는 Android 8.0 이상이 필요합니다. App Store에서 한 번 구입하면 Mac, iPhone, iPad에서 모두 사용할 수 있으며, Android 버전은 Google Play에서 따로 구입합니다.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>머릿속 시차 암산과 Zonette 비교</h2>
+  <p class="section-lead">복잡한 계산이나 새벽 3시 실수 연락 없이 해외 동료와 미팅 일정을 조율하세요.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>시차 암산 및 검색</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>겹치는 시간 찾기</strong></td>
+          <td>머릿속으로 시차를 더하고 빼거나 매번 포털 사이트 검색</td>
+          <td class="highlight-col"><strong>슬라이더를 움직이면 모두가 근무 중인 골든 타임이 녹색으로 즉시 표시</strong></td>
+        </tr>
+        <tr>
+          <td><strong>한눈에 확인</strong></td>
+          <td>웹 브라우저 탭을 열거나 스마트폰 위젯을 뒤적여야 함</td>
+          <td class="highlight-col"><strong>macOS 메뉴 막대 아이콘에서 언제든 단 한 번의 클릭으로 확인</strong></td>
+        </tr>
+        <tr>
+          <td><strong>시간 공유하기</strong></td>
+          <td>채팅방에서 모호한 현지 시간을 일일이 설명해야 하는 불편함</td>
+          <td class="highlight-col"><strong>원클릭으로 Slack 상대방 화면에 맞게 자동 변환되는 시간 서식 복사</strong></td>
+        </tr>
+        <tr>
+          <td><strong>서머타임</strong></td>
+          <td>해외 각국의 서머타임 변경일을 잊어버려 회의에 지각</td>
+          <td class="highlight-col"><strong>전 세계 일광 절약 시간제(DST) 변화를 자동으로 완벽하게 계산</strong></td>
+        </tr>
+        <tr>
+          <td><strong>개인정보 보호</strong></td>
+          <td>광고와 쿠키 추적으로 가득 찬 무료 시간대 변환 웹사이트</td>
+          <td class="highlight-col"><strong>인터넷 통신 없이 기기 내부에서 100% 순수 로컬로 즉시 연산</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>한 문단으로 보는 개인정보 보호</h2>
   <p>Zonette에는 네트워크 접근도, 계정도, 추적도 없습니다. 도시 목록과 지도는 앱에 포함되어 있습니다. 일정을 켜면 기기에서 캘린더를 읽을 뿐, 어디로도 아무것도 보내지 않습니다. <a href="privacy.html">개인정보 처리방침</a> 전문에서 같은 내용을 더 자세히 설명합니다.</p>

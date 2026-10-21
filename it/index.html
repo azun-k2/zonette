@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Cursore temporale visivo su 24 ore · Trova finestre di incontro condivise</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Tutti i fusi orari che ti interessano, a un clic.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Dimostrazione interattiva: selettore fusi orari 24 ore e schede città">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Trascina ora:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoi)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoi</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Orario di ufficio (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokyo</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Orario di ufficio (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 Londra</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Sveglio / Flessibile (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Dorme / Notte (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Trascina la barra per trovare le ore lavorative condivise nel mondo</span>
+  </div>
+  <p class="demo-note">Simulazione visiva. Nell'app per Mac, Zonette vive nella barra dei menu e copia timestamp per Slack con un clic.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoi)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Orario di ufficio (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Sveglio / Flessibile (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Dorme / Notte (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">Richiede macOS 14 Sonoma o versioni successive, iOS 17 o iPadOS 17 o versioni successive, oppure Android 8.0 o versioni successive. Un solo acquisto sull’App Store vale per Mac, iPhone e iPad; la versione Android si acquista a parte su Google Play.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Calcolo mentale dei fusi orari a confronto con Zonette</h2>
+  <p class="section-lead">Coordina riunioni internazionali senza calcoli a mente né chiamate alle 3 di notte.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Caratteristica</th>
+          <th>Calcoli a mente e Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ore condivise</strong></td>
+          <td>Calcolare i fusi orari a mente o cercare continuamente su Google</td>
+          <td class="highlight-col"><strong>Trascina un cursore e vedi le ore di ufficio condivise evidenziate in verde</strong></td>
+        </tr>
+        <tr>
+          <td><strong>A colpo d'occhio</strong></td>
+          <td>Aprire schede web o controllare i widget del telefono</td>
+          <td class="highlight-col"><strong>Gli orari delle tue città sempre visibili nella barra dei menu</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Condividere orari</strong></td>
+          <td>Digitare orari locali ambigui nelle chat di gruppo</td>
+          <td class="highlight-col"><strong>Un clic copia la stringa con formato universale per Slack</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Ora legale</strong></td>
+          <td>Dimenticare i cambi d'ora stagionali negli altri continenti</td>
+          <td class="highlight-col"><strong>Gestione automatica e accurata di tutti i passaggi all'ora legale</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Privacy</strong></td>
+          <td>Siti web di conversione carichi di annunci e tracker</td>
+          <td class="highlight-col"><strong>Calcoli 100% locali sul tuo Mac senza alcun accesso alla rete</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>La privacy in un paragrafo</h2>
   <p>Zonette non ha accesso alla rete, né account, né tracciamento. L’elenco delle città e la mappa sono inclusi nell’app. Se attivi gli eventi, legge il tuo calendario sul tuo dispositivo e non invia mai nulla da nessuna parte. L’<a href="privacy.html">informativa sulla privacy</a> completa dice lo stesso in modo più esteso.</p>

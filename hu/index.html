@@ -52,6 +52,7 @@
 <body>
 <main>
 <div class="hero">
+  <div class="hero-pill">⚡ Vizuális 24 órás idővonal · Találja meg a közös megbeszélési időpontokat</div>
   <img class="icon" src="../icon-512.png" alt="" width="112" height="112">
   <h1>Zonette</h1>
   <p class="tagline">Minden időzóna, ami fontos neked, egy kattintásnyira.</p>
@@ -108,6 +109,88 @@
   </details><!-- /family:nav -->
   </nav>
 </div>
+<div class="demo-wrapper" id="demo">
+  <div class="zonette-stage" role="group" aria-label="Interaktív bemutató: 24 órás időzóna-csúszka és világvárosok">
+    <div class="zonette-scrubber-bar">
+      <span>🕒 Időpont húzása:</span>
+      <input type="range" id="znSlider" min="0" max="23" value="14">
+      <strong id="znLabel">14:00 (Hanoi)</strong>
+    </div>
+    <div class="zonette-cities">
+      <div class="zonette-city-card" id="znCard-0">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇻🇳 Hanoi</strong>
+          <span id="znIcon-0">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-0">14:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-0">Munkaidő (UTC+7)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-1">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇯🇵 Tokió</strong>
+          <span id="znIcon-1">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-1">16:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-1">Munkaidő (UTC+9)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-2">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇬🇧 London</strong>
+          <span id="znIcon-2">☀️</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-2">07:00</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-2">Ébren / Rugalmas (UTC+0)</div>
+      </div>
+      <div class="zonette-city-card" id="znCard-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:14px;">🇺🇸 San Francisco</strong>
+          <span id="znIcon-3">🌙</span>
+        </div>
+        <div class="zonette-city-time" id="znTime-3">23:00 (-1d)</div>
+        <div style="font-size:12px; color:var(--muted);" id="znStatus-3">Alszik / Éjszaka (UTC-8)</div>
+      </div>
+    </div>
+    <span class="demo-hint">💡 Húzza az idővonalat a közös munkaidő megtalálásához a globális csapatokkal</span>
+  </div>
+  <p class="demo-note">Vizuális szimuláció. A Mac appban a Zonette a menüsorban él, és egy kattintással másol Slack időbélyegeket.</p>
+</div>
+<script>
+(function () {
+  var slider = document.getElementById('znSlider'), label = document.getElementById('znLabel');
+  var cities = [
+    { id: 0, off: 0, utc: 'UTC+7' },
+    { id: 1, off: 2, utc: 'UTC+9' },
+    { id: 2, off: -7, utc: 'UTC+0' },
+    { id: 3, off: -15, utc: 'UTC-8' }
+  ];
+  function update(baseH) {
+    var h = parseInt(baseH, 10);
+    label.textContent = (h < 10 ? '0' : '') + h + ':00 (Hanoi)';
+    cities.forEach(function(c) {
+      var cur = h + c.off;
+      var dayDiff = cur < 0 ? ' (-1d)' : (cur >= 24 ? ' (+1d)' : '');
+      var norm = (cur % 24 + 24) % 24;
+      var timeStr = (norm < 10 ? '0' : '') + norm + ':00' + dayDiff;
+      var isDay = norm >= 8 && norm <= 21;
+      document.getElementById('znTime-' + c.id).textContent = timeStr;
+      document.getElementById('znIcon-' + c.id).textContent = isDay ? '☀️' : '🌙';
+      var card = document.getElementById('znCard-' + c.id), st = document.getElementById('znStatus-' + c.id);
+      if (norm >= 9 && norm <= 18) {
+        st.textContent = "Munkaidő (" + c.utc + ")";
+        card.style.borderColor = '#28ca41';
+      } else if (norm >= 7 && norm <= 23) {
+        st.textContent = "Ébren / Rugalmas (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 200, 50, 0.35)';
+      } else {
+        st.textContent = "Alszik / Éjszaka (" + c.utc + ")";
+        card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      }
+    });
+  }
+  slider.addEventListener('input', function() { update(slider.value); });
+  update(14);
+})();
+</script>
 
 <!-- family:shot --><figure class="shot"><img src="../img/hero.jpg" alt="" width="1600" height="860"></figure><!-- /family:shot -->
 <section class="card">
@@ -126,6 +209,48 @@
   <p class="note">macOS 14 Sonoma vagy újabb, iOS 17 vagy iPadOS 17 vagy újabb, illetve Android 8.0 vagy újabb szükséges. Egyetlen App Store-vásárlás érvényes Macre, iPhone-ra és iPadre; az androidos változatot külön kell megvenni a Google Playen.</p>
 </section>
 
+<section class="card comparison-card" id="comparison">
+  <h2>Fejszámolás időzónákkal és a Zonette</h2>
+  <p class="section-lead">Egyeztessen nemzetközi hívásokat fejszámolás vagy éjszaka 3 órai meglepetések nélkül.</p>
+  <div class="table-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Szempont</th>
+          <th>Fejszámolás és Google</th>
+          <th class="highlight-col">Zonette</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Közös időablak</strong></td>
+          <td>Időeltolódások számolgatása fejben vagy állandó keresés</td>
+          <td class="highlight-col"><strong>Húzza el a csúszkát és lássa zölddel kiemelve a közös munkaidőt</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Egy pillantással</strong></td>
+          <td>Böngészőlapok nyitogatása vagy telefonos widgetek nézegetése</td>
+          <td class="highlight-col"><strong>Diszkrét városi idők közvetlenül a macOS menüsorában</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Időpont megosztása</strong></td>
+          <td>Félreérthető helyi idők gépelése a csapatcsevegésben</td>
+          <td class="highlight-col"><strong>Egyetlen kattintás univerzális időbélyeget másol a Slackhez</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Nyári időszámítás</strong></td>
+          <td>Más földrészek óraátállításainak elfelejtése</td>
+          <td class="highlight-col"><strong>Automatikus és pontos szezonális időátállítás-kezelés</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Adatvédelem</strong></td>
+          <td>Hirdetésekkel és követőkódokkal teli átváltó weboldalak</td>
+          <td class="highlight-col"><strong>100%-ban helyi számítások hálózati kapcsolat nélkül</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card">
   <h2>Adatvédelem egy bekezdésben</h2>
   <p>A Zonette-nek nincs hálózati hozzáférése, fiókja és követése. A városlista és a térkép az appal együtt érkezik. Ha bekapcsolod az eseményeket, az eszközödön olvassa a naptáradat, és soha semmit nem küld sehová. A teljes <a href="privacy.html">adatvédelmi irányelvek</a> ugyanezt mondják el részletesebben.</p>
